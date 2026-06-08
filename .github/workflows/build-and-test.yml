@@ -23,6 +23,7 @@ jobs:
       image: termux/termux-docker:${{ matrix.architecture }}
       volumes: 
         - /tmp/node20:/__e/node20
+      options: --privileged
     # approximate environment variables for actions that can't be forced to use entrypoint.sh
     env:
       TERMUX_MAIN_PACKAGE_FORMAT: debian
@@ -35,6 +36,16 @@ jobs:
       LANG: en_US.UTF-8
       TZ: UTC
     steps:
+      - name: set pid_max to 65535
+        run: /entrypoint_root.sh sh -c "echo 65535 | tee /proc/sys/kernel/pid_max"
+      - name: check pid_max is 65535
+        run: |
+          if [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
+            echo "Successfully changed /proc/sys/kernel/pid_max for container namespace"
+          else
+            echo "Failed to change /proc/sys/kernel/pid_max for container namespace"
+            exit 1
+          fi
       - name: set pkg command to use the packages-cf.termux.dev mirror
         run: ln -sf ${PREFIX}/etc/termux/mirrors/default ${PREFIX}/etc/termux/chosen_mirrors
       - name: upgrade all packages to prepare for installing nodejs
