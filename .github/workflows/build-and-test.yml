@@ -39,7 +39,7 @@ jobs:
       - name: set pid_max to 65535
         uses: docker://busybox:uclibc
         with:
-          args: echo 65535 | tee /proc/sys/kernel/pid_max
+          args: sh -c "echo 65535 | tee /proc/sys/kernel/pid_max"
       - name: check pid_max is 65535
         run: |
           if [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
