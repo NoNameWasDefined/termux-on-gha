@@ -21,6 +21,12 @@ jobs:
             bitness: 64
     runs-on: ${{ matrix.runner }}
     services:
+      fix_permissions:
+        image: busybox:musl
+        volumes:
+          - /tmp/node20:/__e/node20
+        entrypoint: ''
+        command: sh -c 'chmod -R a+rwx /__e/node20'
       set_pid_max:
         image: ${{ matrix.bitness == '32' && 'busybox:musl' || '' }}
         options: --privileged
