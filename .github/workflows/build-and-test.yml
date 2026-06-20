@@ -48,12 +48,16 @@ jobs:
     steps:
       - name: check pid_max is 65535
         run: |
-          if [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
-            echo "Successfully changed /proc/sys/kernel/pid_max for container namespace"
-          else
-            echo "Failed to change /proc/sys/kernel/pid_max for container namespace"
-            exit 1
-          fi
+          set -euo pipefail
+          TIMEOUT=30
+          START=$SECONDS
+          until [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
+            if (( SECONDS - START >= TIMEOUT )); then
+              echo "Failed to change /proc/sys/kernel/pid_max for container namespace"
+              exit 1
+            fi
+          done
+          echo "Successfully changed /proc/sys/kernel/pid_max for runner namespace after $SECONDS seconds"
       - name: set pkg command to use the packages-cf.termux.dev mirror
         run: ln -sf ${PREFIX}/etc/termux/mirrors/default ${PREFIX}/etc/termux/chosen_mirrors
       - name: upgrade all packages to prepare for installing nodejs
