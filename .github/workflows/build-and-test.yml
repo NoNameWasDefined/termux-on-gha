@@ -9,13 +9,23 @@ jobs:
         include:
           - runner: ubuntu-24.04
             architecture: i686
+            bitness: 32
           - runner: ubuntu-24.04
             architecture: x86_64
+            bitness: 64
           - runner: ubuntu-24.04-arm
             architecture: arm
+            bitness: 32
           - runner: ubuntu-24.04-arm
             architecture: aarch64
+            bitness: 64
     runs-on: ${{ matrix.runner }}
+    services:
+      set_pid_max:
+        image: ${{ matrix.bitness == '32' && 'busybox:musl' || '' }}
+        options: --privileged
+        entrypoint: sh -c
+        command: echo 65535 | tee /proc/sys/kernel/pid_max
     # prepare writable volume prefix mount for actions/upload-artifact,
     # based on the higher-profile workaround for 32-bit GNU/Linux containers explained here
     # https://github.com/actions/upload-artifact/issues/616#issuecomment-2350667347
@@ -23,7 +33,7 @@ jobs:
       image: termux/termux-docker:${{ matrix.architecture }}
       volumes: 
         - /tmp/node20:/__e/node20
-      options: --privileged --user 1000
+      options: --user 1000
     # approximate environment variables for actions that can't be forced to use entrypoint.sh
     env:
       TERMUX_MAIN_PACKAGE_FORMAT: debian
@@ -36,14 +46,6 @@ jobs:
       LANG: en_US.UTF-8
       TZ: UTC
     steps:
-      - name: set pid_max to 65535
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const fs = require('fs');
-
-            fs.writeFileSync('/proc/sys/kernel/pid_max', '65565\n');
-          # args: /bin/busybox sh -c "echo 65535 | /bin/busybox tee /proc/sys/kernel/pid_max"
       - name: check pid_max is 65535
         run: |
           if [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
