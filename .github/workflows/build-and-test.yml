@@ -52,7 +52,7 @@ jobs:
           set -euo pipefail
           TIMEOUT=30
           START=$SECONDS
-          until [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
+          until [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; do
             if (( SECONDS - START >= TIMEOUT )); then
               echo "Failed to change /proc/sys/kernel/pid_max for container namespace"
               exit 1
