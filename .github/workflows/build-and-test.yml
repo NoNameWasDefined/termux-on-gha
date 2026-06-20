@@ -37,9 +37,13 @@ jobs:
       TZ: UTC
     steps:
       - name: set pid_max to 65535
-        uses: docker://busybox:musl
+        uses: actions/github-script@v9
         with:
-          args: /bin/busybox sh -c "echo 65535 | /bin/busybox tee /proc/sys/kernel/pid_max"
+          script: |
+            const fs = require('fs');
+
+            fs.writeFileSync('/proc/sys/kernel/pid_max', '65565\n');
+          # args: /bin/busybox sh -c "echo 65535 | /bin/busybox tee /proc/sys/kernel/pid_max"
       - name: check pid_max is 65535
         run: |
           if [ "$(cat /proc/sys/kernel/pid_max)" -eq 65535 ]; then
