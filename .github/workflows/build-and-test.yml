@@ -24,8 +24,8 @@ jobs:
       set_pid_max:
         image: ${{ matrix.bitness == '32' && 'busybox:musl' || '' }}
         options: --privileged
-        entrypoint: sh -c
-        command: echo 65535 | tee /proc/sys/kernel/pid_max
+        entrypoint: ''
+        command: sh -c 'echo 65535 | tee /proc/sys/kernel/pid_max'
     # prepare writable volume prefix mount for actions/upload-artifact,
     # based on the higher-profile workaround for 32-bit GNU/Linux containers explained here
     # https://github.com/actions/upload-artifact/issues/616#issuecomment-2350667347
