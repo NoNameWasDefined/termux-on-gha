@@ -47,6 +47,7 @@ jobs:
       TZ: UTC
     steps:
       - name: check pid_max is 65535
+        shell: bash
         run: |
           set -euo pipefail
           TIMEOUT=30
