@@ -23,7 +23,7 @@ jobs:
       image: termux/termux-docker:${{ matrix.architecture }}
       volumes: 
         - /tmp/node20:/__e/node20
-      options: --user 1000
+      options: --privileged --user 1000
     # approximate environment variables for actions that can't be forced to use entrypoint.sh
     env:
       TERMUX_MAIN_PACKAGE_FORMAT: debian
